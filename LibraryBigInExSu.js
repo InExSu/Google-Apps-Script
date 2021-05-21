@@ -33,13 +33,13 @@ function Array2D_Update_by_Map(array2d_New, array2d_Old,
   // 				Обновить значения элементов текущей строки массива назначения
 
   // копировать массив 2мерный не просто
-  var array2d_return = JSON.parse(JSON.stringify(array2d_Old))
+  var array2d_ret = JSON.parse(JSON.stringify(array2d_Old))
 
+  var code = '';
   var row_New = -1;
   var row_Old = 0;
-  var code = '';
-  var column_New = -1;
-  var column_Old = -1;
+  var col_New = -1;
+  var col_Old = -1;
 
   //var a2d_log = [['Код', 'Строка', 'Столбец', 'Было', 'Стало']];
   var a2d_log = [['Лог обновления', '', Utilities.formatDate(new Date(), "GMT+3", "yyyy-MM-dd HH:mm:ss' мск'"), '', '']];
@@ -49,12 +49,12 @@ function Array2D_Update_by_Map(array2d_New, array2d_Old,
   var col = '';
   var was_new = '';
   var now_new = '';
-  var was_orig = '';
-  var now_orig = '';
+  var was_org = '';
+  var now_org = '';
 
-  for (row_Old = 0; row_Old < array2d_return.length; row_Old++) {
+  for (row_Old = 0; row_Old < array2d_ret.length; row_Old++) {
 
-    code = String(array2d_return[row_Old][column_code]);
+    code = String(array2d_ret[row_Old][column_code]);
 
     if (map_codes.has(code)) {
 
@@ -63,20 +63,20 @@ function Array2D_Update_by_Map(array2d_New, array2d_Old,
       // проход по строкам массива соответствия номеров столбцов
       for (var row_columns = 0; row_columns < array2d_columns.length; row_columns++) {
 
-        column_Old = array2d_columns[row_columns][0];
-        column_New = array2d_columns[row_columns][1];
+        col_Old = array2d_columns[row_columns][0];
+        col_New = array2d_columns[row_columns][1];
 
-        if (code == '_0000019005' && column_New == 13) {
+        if (code == '_0000019005' && col_New == 14) {
           var stop = '';
+          Logger.log(array2d_New[row_New][col_New]);
         }
 
         // было и стало в отчёт
-        was_orig = array2d_return[row_Old][column_Old];
-        now_orig = array2d_New[row_New][column_New];
+        was_org = array2d_ret[row_Old][col_Old];
+        now_org = array2d_New[row_New][col_New];
 
-
-        was_new = String(was_orig);
-        now_new = String(now_orig);
+        was_new = String(was_org);
+        now_new = String(now_org);
 
         // из Excel вставляются числа с пробелами
         was_new = string_2_float_if(was_new);
@@ -93,20 +93,21 @@ function Array2D_Update_by_Map(array2d_New, array2d_Old,
         if (was_new != now_new) {
 
           // гуглтаблица значения с двумя запятыми стремится преобразовать во время
-          now_new = symbolsMore1RepeatsReplace(now_new, ',', ' / ');
-          now_new = apostropheIfSymbolsMoreRepeats(now_new, ',', 1);
+          // now_new = symbolsMore1RepeatsReplace(now_new, ',', ' / ');
+          // now_new = apostropheIfSymbolsMoreRepeats(now_new, ',', 1);
 
-          if ((row_Old + 1) == 1177 && column_Old == 15 + 1) {
-            var stop = '';
-          }
+          // для отладки
+          // if ((row_Old + 1) == 528 && col_Old == 6) {
+          //   var stop = '';
+          // }
           // заголовок столбца в отчёт
-          col = array2d_New[0][column_New];
+          col = array2d_New[0][col_New];
 
           if (sheet_log_name) {
-            a2d_log.push([code, row_Old + 1, col, was_orig, now_new]);
+            a2d_log.push([code, row_Old + 1, col, was_org, now_new]);
           }
 
-          array2d_return[row_Old][column_Old] = now_new;
+          array2d_ret[row_Old][col_Old] = now_new;
         }
       }
     }
@@ -118,12 +119,10 @@ function Array2D_Update_by_Map(array2d_New, array2d_Old,
     sheet_logit.clear();
 
     cell = sheet_logit.getRange(1, 1);
-    // удалить строки из одинаковых значений по столбцам
-    // a2d_log = Array2d_ColumnsEquals_RowsDelete(a2d_log);
     Array2d_2_Range(cell, a2d_log);
   }
 
-  return array2d_return;
+  return array2d_ret;
 
 }
 
@@ -208,9 +207,13 @@ function Range_Rows_Test() {
 }
 
 function Range_Rows(range_In, rows_count) {
+
   // вернуть строки диапазона
+
+  // Parent двухходовочка
   var sheet_id = range_In.getGridId();
   var sheet_ob = SheetById(sheet_id);
+
   var row_number = range_In.getRow();
   var column_number = range_In.getColumn(); //starting column position for this range
   var columns_count = range_In.getNumColumns();
@@ -533,6 +536,7 @@ function string_2_float_if(string_in) {
 }
 
 function Date_Time_Local() {
+  // набросок
   var formattedDate = Utilities.formatDate(new Date(), "GMT+3", "yyyy-MM-dd HH:mm:ss");
   Logger.log(formattedDate);
 }
@@ -584,4 +588,90 @@ function apostropheIfSymbolsMoreRepeats(stri, find, mini) {
     return "'" + stri;
   }
   return stri;
+}
+
+
+function Array2DFormRangeWithApostorphes(rng_New_In) {
+
+  // гуглтаблица, при вставке диапазона в массив (getValues) 
+  // пытается преобразовать значения в двойными запятыми в формат даты, 
+  // копировать диапазон в новый лист и всем ячейкам, не пустым, проставить апостроф
+  // имменно в ДИАПАЗОНЕ (ибо в массив попадут уже "улучшенные" значения).
+  // вернуть массив с апострофами, а лист удалить
+
+  var spreadSh = SpreadsheetApp.getActiveSpreadsheet();
+  var sheetTmp = spreadSh.insertSheet();
+  var rangeTmp = sheetTmp.getRange(1, 1);
+  rng_New_In.copyTo(rangeTmp);
+
+  // UsedRange
+  var rng = sheetTmp.getDataRange();
+
+}
+
+function rangeApostropheAddIfMoreOne_Test() {
+  var sheet = SpreadsheetApp.getActive().getSheetByName('Ошибки');
+  // sheet.getRange(2, 2).setValue(',');
+  // sheet.getRange(2, 3).setValue(',,');
+  // var rng = sheet.getRange('B2:C2')
+  // rangeApostropheAddIfMoreOne(rng, ',');
+  var rng = sheet.getRange('E1')
+  rangeApostropheAddIfMoreOne(rng, ',');
+
+  Logger.log(sheet.getRange('E1').getValue());
+}
+
+function rangeApostropheAddIfMoreOne(rng, symb) {
+
+  // проходом по ячейкам диапазона
+  // значениям c двумя и более symb добавить спереди апостроф
+
+  var sh_id = rng.getGridId();
+  var sheet = SheetById(sh_id);
+
+  var val = '';
+  var rowStart = rng.getRow();
+  var colStart = rng.getColumn();
+  var row_Stop = rowStart + rng.getNumRows() - 1;
+  var col_Stop = colStart + rng.getNumColumns() - 1;
+  var pos_Frst = -1;
+  var pos_Last = -1;
+
+  for (var row = rowStart; row <= row_Stop; row++) {
+    for (var col = colStart; col <= col_Stop; col++) {
+
+      val = sheet.getRange(row, col).getValue();
+
+      Logger.log(val);
+
+      if (val.length > 0) {
+
+        pos_Frst = val.indexOf(symb);
+        pos_Last = val.lastIndexOf(symb);
+
+        if (pos_Frst != pos_Last) {
+
+          sheet.getRange(row, col).setValue("'" + val);
+
+        }
+      }
+    }
+  }
+  return rng;
+}
+
+
+function textFinder_test() {
+  // набросок
+  var sheet = SpreadsheetApp.getActive().getSheetByName('Ошибки');
+  var textFinder = sheet.createTextFinder(',')
+    .matchEntireCell(false)
+    .useRegularExpression(true);
+
+  var a1_rng = textFinder.findAll();
+  for (var key in a1_rng) {  // OK in V8
+    var key = a1_rng[key];
+    var val = key.getValue();
+    Logger.log("val = %s", val);
+  }
 }

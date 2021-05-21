@@ -44,8 +44,11 @@ function Range_Update_by_Heads_RUN() {
 
   var spread = SpreadsheetApp.getActiveSpreadsheet();
   var sheet_New = spread.getActiveSheet();
+
   // диапазон источника обновления вокруг ячейки, CurrentRegion
   var range_New = sheet_New.getRange("Range_New").getDataRegion();
+  // ячейкам текстовый формат, чтобы значения вида '1,1,2005' не преобразовывались в строку даты время
+  range_New.setNumberFormat('@');
 
   var sheet_Old_name = sheet_New.getRange("Sheet_Old").getValue();
   var sheet_Old = spread.getSheetByName(sheet_Old_name);
@@ -82,7 +85,7 @@ function Range_Update_by_Heads_RUN() {
 
       // Пусть пользователь проверит соответствия номеров столбцов.
       var choice = ''
-      // choice = Browser.msgBox('Найдены столбцы в обоих диапазонах: ' + string_columns, Browser.Buttons.YES_NO);
+      choice = Browser.msgBox('Найдены столбцы в обоих диапазонах: ' + string_columns, Browser.Buttons.YES_NO);
       if (choice == 'no') {
 
         // Выход по выбору пользователя
@@ -124,13 +127,14 @@ function Range_Update_by_Heads_RUN() {
 }
 
 
-function Range_Update_by_Heads(rng_Old, column_Key_Old, rng_New, column_Key_New, a2d_columns, log_make) {
+function Range_Update_by_Heads(rng_Old, column_Key_Old, rng_New_In, column_Key_New, a2d_columns, log_make) {
 
   // Обновить диапазон по совпадению в ключевых столбцах с учётом наименований столбцов
   // диапазоны в массивы
 
   var a2d_Old = rng_Old.getValues();
-  var a2d_New = rng_New.getValues();
+
+  var a2d_New = rng_New_In.getValues();
   var map_Sea = Array2D_2_Map(a2d_New, column_Key_New);
 
   // основное действие
