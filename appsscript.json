@@ -1,0 +1,43 @@
+{
+  "timeZone": "America/New_York",
+  "dependencies": {
+  },
+  "exceptionLogging": "STACKDRIVER",
+  "runtimeVersion": "V8",
+  "sheets": {
+    "macros": [{
+      "menuName": "ЛистКопировать",
+      "functionName": "myFunction2"
+    }, {
+      "menuName": "SheetCopy",
+      "functionName": "SheetCopy"
+    }, {
+      "menuName": "Новый макрос",
+      "functionName": "myFunction"
+    }, {
+      "menuName": "Вставка",
+      "functionName": "myFunction"
+    }, {
+      "menuName": "RowsDelete",
+      "functionName": "RowsDelete"
+    }, {
+      "menuName": "СтрокиНесколькоУдалить",
+      "functionName": "myFunction"
+    }, {
+      "menuName": "Row222",
+      "functionName": "Row222"
+    }, {
+      "menuName": "RowsDele",
+      "functionName": "RowsDele"
+    }, {
+      "menuName": "RowsDelelelelel",
+      "functionName": "RowsDelelelelel"
+    }, {
+      "menuName": "RowDelelelele",
+      "functionName": "RowDelelelele"
+    }, {
+      "menuName": "DeleteCreate",
+      "functionName": "DeleteCreate"
+    }]
+  }
+}
