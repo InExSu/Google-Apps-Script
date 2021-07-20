@@ -1,3 +1,1 @@
-# My GitHub Project
-
-This is my GitHub project. I published it directly from Visual Studio Code.
+Google Apps Script methods for working with google spreadsheets
