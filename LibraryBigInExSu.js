@@ -18,8 +18,8 @@ function Array2D_Update_by_Map_Test() {
 
   var a2d_New = Array2D_Update_by_Map(a2d_New, a2d_Old, column_code, map_codes, array2d_columns, 'Log');
 
-  Logger.log('a2d_New ' + a2d_New);
-  Logger.log('a2d_Update ' + a2d_Old);
+  // Logger.log('a2d_New ' + a2d_New);
+  // Logger.log('a2d_Update ' + a2d_Old);
 }
 
 
@@ -32,7 +32,7 @@ function Array2D_Update_by_Map(array2d_New, array2d_Old,
   // 			Проходом по массиву соответствия номеров столбцов	
   // 				Обновить значения элементов текущей строки массива назначения
 
-  // копировать массив 2мерный не просто
+  // массив 2мерный копировать не просто
   var array2d_ret = JSON.parse(JSON.stringify(array2d_Old))
 
   var code = '';
@@ -49,8 +49,8 @@ function Array2D_Update_by_Map(array2d_New, array2d_Old,
   var col = '';
   var was_new = '';
   var now_new = '';
-  var was_org = '';
-  var now_org = '';
+  var was_old = '';
+  var now_old = '';
 
   for (row_Old = 0; row_Old < array2d_ret.length; row_Old++) {
 
@@ -66,17 +66,12 @@ function Array2D_Update_by_Map(array2d_New, array2d_Old,
         col_Old = array2d_columns[row_columns][0];
         col_New = array2d_columns[row_columns][1];
 
-        if (code == '_0000019005' && col_New == 14) {
-          var stop = '';
-          Logger.log(array2d_New[row_New][col_New]);
-        }
-
         // было и стало в отчёт
-        was_org = array2d_ret[row_Old][col_Old];
-        now_org = array2d_New[row_New][col_New];
+        was_old = array2d_ret[row_Old][col_Old];
+        now_old = array2d_New[row_New][col_New];
 
-        was_new = String(was_org);
-        now_new = String(now_org);
+        was_new = String(was_old);
+        now_new = String(now_old);
 
         // из Excel вставляются числа с пробелами
         was_new = string_2_float_if(was_new);
@@ -90,21 +85,17 @@ function Array2D_Update_by_Map(array2d_New, array2d_Old,
         if (was_new == '#ЗНАЧ!') { was_new = '#VALUE!' };
         if (now_new == '#ЗНАЧ!') { now_new = '#VALUE!' };
 
-        if (was_new != now_new) {
+        if (String(was_new) != String(now_new)) {
 
           // гуглтаблица значения с двумя запятыми стремится преобразовать во время
           // now_new = symbolsMore1RepeatsReplace(now_new, ',', ' / ');
           // now_new = apostropheIfSymbolsMoreRepeats(now_new, ',', 1);
 
-          // для отладки
-          // if ((row_Old + 1) == 528 && col_Old == 6) {
-          //   var stop = '';
-          // }
           // заголовок столбца в отчёт
           col = array2d_New[0][col_New];
 
           if (sheet_log_name) {
-            a2d_log.push([code, row_Old + 1, col, was_org, now_new]);
+            a2d_log.push([code, row_Old + 1, col, was_old, now_new]);
           }
 
           array2d_ret[row_Old][col_Old] = now_new;
@@ -119,7 +110,7 @@ function Array2D_Update_by_Map(array2d_New, array2d_Old,
     sheet_logit.clear();
 
     cell = sheet_logit.getRange(1, 1);
-    Array2d_2_Range(cell, a2d_log);
+    array2d2Range(cell, a2d_log);
   }
 
   return array2d_ret;
@@ -155,13 +146,13 @@ function SheetNameDelete(sheetName) {
   }
 };
 
-function getSheetById_test() {
+function getsheetById_test() {
   id = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet().getActiveCell().getGridId();
-  var sheet = SheetById(id);
+  var sheet = sheetById(id);
   Logger.log(sheet.getName());
 }
 
-function SheetById(id) {
+function sheetById(id) {
   // вернуть лист по id
   return SpreadsheetApp.getActive().getSheets().filter(
     function (s) {
@@ -212,7 +203,7 @@ function Range_Rows(range_In, rows_count) {
 
   // Parent двухходовочка
   var sheet_id = range_In.getGridId();
-  var sheet_ob = SheetById(sheet_id);
+  var sheet_ob = sheetById(sheet_id);
 
   var row_number = range_In.getRow();
   var column_number = range_In.getColumn(); //starting column position for this range
@@ -367,7 +358,7 @@ function Array2D_Column_2_String(array2d, column, separator) {
   return string_new;
 }
 
-function Array2d_2_Range_Test() {
+function array2d2Range_Test() {
 
   var sheet = SpreadsheetApp.getActive().getSheetByName('Ошибки');
   var cellu = sheet.getRange(1, 1);
@@ -377,15 +368,15 @@ function Array2d_2_Range_Test() {
     [3, 4]
   ];
 
-  Array2d_2_Range(cellu, a2dim);
+  array2d2Range(cellu, a2dim);
 }
 
-function Array2d_2_Range(cell, a2d) {
+function array2d2Range(cell, a2d) {
 
   // массив 2мерный вставить на лист
 
   var sheet_id = cell.getGridId();
-  var sheet_ob = SheetById(sheet_id);
+  var sheet_ob = sheetById(sheet_id);
   var row_numb = cell.getRow();
   var col_numb = cell.getColumn();
 
@@ -471,9 +462,9 @@ function Array1D_2_String(a1d, sepa) {
 function symbols_by_template(string_in, string_check) {
 
   // вернуть строку из символов string_in, которые ЕСТЬ в string_chek 
-  // float = '0123456789,'
+  // float = '0123456789,.'
 
-  var str_ret = ''
+  var str_ret = '';
   var str_idx = '';
 
   for (var i = 0; i < string_in.length; i++) {
@@ -508,7 +499,6 @@ function symbols_NOT_in_template(string_in, string_chek) {
 
     }
   }
-
   return str_ret;
 }
 
@@ -524,7 +514,7 @@ function string_2_float_if(string_in) {
   // иначе вернуть оригинальную строку
 
   // сначала определяю наличие не нужных символов
-  var other = symbols_NOT_in_template(string_in, '0123456789 ,');
+  var other = symbols_NOT_in_template(string_in, '0123456789 ,.');
 
   if (other.length > 0) {
 
@@ -532,7 +522,7 @@ function string_2_float_if(string_in) {
 
   }
 
-  return symbols_by_template(string_in, '0123456789,');
+  return symbols_by_template(string_in, '0123456789,.');
 }
 
 function Date_Time_Local() {
@@ -627,7 +617,7 @@ function rangeApostropheAddIfMoreOne(rng, symb) {
   // значениям c двумя и более symb добавить спереди апостроф
 
   var sh_id = rng.getGridId();
-  var sheet = SheetById(sh_id);
+  var sheet = sheetById(sh_id);
 
   var val = '';
   var rowStart = rng.getRow();
@@ -674,4 +664,227 @@ function textFinder_test() {
     var val = key.getValue();
     Logger.log("val = %s", val);
   }
+}
+
+//  ==='
+function digitsSpacesKiller() {
+
+  // в выделенных ячейках,содержащих только цифры, пробелы, системный разделитель десятичных чисел,
+  // удалить пробел
+
+  var rng = SpreadsheetApp.getActiveRange();
+
+  if (rng === null) {
+    // нет выделенного диапазона
+  } else {
+
+    var a2d = rng.getValues();
+
+    a2d = arrayXdDigitsSpaceKiller(a2d, '0123456789 ,');
+
+    // вставить массив на лист
+
+    array2d2Range(rng, a2d);
+  }
+}
+
+
+function array2dDigitsSpaceKiller_Test() {
+  var a1d = ['1 ,1', '', '1', 'z1'];
+  a1d = arrayXdDigitsSpaceKiller(a1d, '0123456789 ,');
+  Logger.log(a1d);
+}
+
+
+function arrayXdDigitsSpaceKiller(aXd, tmp) {
+
+  // в массиве, в элементах, содержащих только:
+  // цифры, пробелы, системный разделитель десятичных чисел - 
+  // удалить пробел 
+
+  var ele = '';
+
+  for (var idx = 0; idx < aXd.length; idx++) {
+
+    ele = String(aXd[idx]);
+
+    if (digitWithSpace(ele, tmp)) {
+
+      aXd[idx] = ele.replace(' ', '');
+
+    }
+  }
+
+  return aXd;
+
+}
+
+
+function digitWithSpace_Test() {
+  Logger.log(digitWithSpace('', '0123456789 ,'));
+  Logger.log(digitWithSpace('1', '0123456789 ,'));
+  Logger.log(digitWithSpace('1 ,', '0123456789 ,'));
+  Logger.log(digitWithSpace('z1 ,', '0123456789 ,'));
+}
+
+function digitWithSpace(str, tmp) {
+
+  // строка похожа на число с пробелом ?
+
+  var smb = '';
+
+  for (var pos = 0; pos < str.length; pos++) {
+
+    smb = str[pos];
+
+    if (!symbolInString(smb, tmp)) {
+
+      return false;
+    }
+  }
+
+  return true;
+
+}
+
+
+function symbolInString(smb, str) {
+
+  // символ в строке ?
+
+  if (str.indexOf(smb) < 0) {
+
+    return false;
+  }
+
+  return true;
+}
+
+function array2dColumnSymbolsLeading_Test() {
+
+  var a2d = [
+    ['01', '02'],
+    ['03', '04']
+  ];
+
+  array2dColumnSymbolsLeading(a2d, 1, 0);
+
+  return a2d
+}
+
+function array2dColumnSymbolsLeading(array2d, column, symbol) {
+  // проходом по массиву, по столбцу, убрать лидирующие символы
+  for (var row = 0; row < array2d.length; row++) {
+    array2d[row][column] = stringSymbolsLeadingDelete(array2d[row][column], symbol)
+  }
+}
+
+
+function stringSymbolsLeadingDelete(value, symbol) {
+
+  // лидирующие символы удалить
+
+  var stringReturn = '';
+
+  var stringValue = String(value);
+
+  var regexp = new RegExp('^' + String(symbol) + '+');
+
+  if (stringValue[0] === String(symbol)) {
+
+    stringReturn = stringValue.replace(regexp, '')
+
+  } else {
+
+    stringReturn = stringValue;
+
+  }
+
+  return stringReturn;
+
+}
+
+function cellActiveInfo() {
+
+  // информация об активной ячейки активного листа
+
+  sheet = SpreadsheetApp.getActive().getActiveSheet();
+  sheetName = sheet.getName()
+  cell = sheet.getActiveCell();
+
+  Logger.log('Лист:' + sheetName + ', формат активной ячейки ' + cell.getNumberFormat());
+  Logger.log('getA1Notation(): ' + cell.getA1Notation());
+  Logger.log('getValue(): ' + cell.getValue());
+}
+
+function getRangeColumnByNumb_test() {
+
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var colnm = randomInteger(1, 9)
+  var rangeColumn = getRangeColumnByNumb(sheet, colnm);
+
+  if (colnm !== rangeColumn.getColumn()) {
+    Logger.log('Номер столбца !== ' + colnm);
+  }
+  else {
+    Logger.log('getRangeColumnByNumb_test = OK');
+  }
+  return true;
+}
+
+function getRangeColumnByNumb(sheet, numb) {
+  // вернуть диапазон столбца по номеру столбца
+  var range = sheet.getRange("A:A");
+  var rowsCount = range.getNumRows();
+  return sheet.getRange(1, numb, rowsCount)
+}
+
+function randomInteger(min, max) {
+  // случайное число от min до (max+1)
+  let rand = min + Math.random() * (max + 1 - min);
+  return Math.floor(rand);
+}
+
+function convertIfPossible_Test() {
+  var value = '1,1';
+  var wante = 1;
+  var conve = convertIfPossible(value, parseFloat)
+  if (conve != wante) {
+    Logger.log('convertIfPossible:', conve, ' != ', wante);
+  }
+
+  value = '2,1z';
+  wante = 2;
+  conve = convertIfPossible(value, parseFloat)
+  if (conve != wante) {
+    Logger.log('convertIfPossible: %s != %s', conve, wante);
+  }
+
+  value = '3.1';
+  wante = 3.1;
+  conve = convertIfPossible(value, parseFloat)
+  if (conve != wante) {
+    Logger.log('convertIfPossible: %s != %s', conve, wante);
+  }
+
+  value = '4.1 Z';
+  wante = 4.1;
+  conve = convertIfPossible(value, parseFloat)
+  if (conve != wante) {
+    Logger.log('convertIfPossible: %s != %s', conve, wante);
+  }
+
+  value = 'Z';
+  wante = 'Z';
+  conve = convertIfPossible(value, parseFloat)
+  if (conve != wante) {
+    Logger.log('convertIfPossible: %s != %s', conve, wante);
+  }
+}
+
+
+function convertIfPossible(value, method) {
+  // преобразовать, испрользуя method, иначе вернуть value.
+  var convert = method(value);
+  return isNaN(convert) ? value : convert;
 }
