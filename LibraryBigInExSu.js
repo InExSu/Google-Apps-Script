@@ -1,5 +1,8 @@
 // Библиотека методов InExSu
 
+const DIGITS_COMMA_POINT = '0123456789,.';
+const DIGITS_COMMA_POINT_SPACE = '0123456789 ,.';
+
 function Array2D_Update_by_Map_Test() {
   var a2d_New = [
     ['CodeSour', 'ValueSour'],
@@ -81,11 +84,14 @@ function Array2D_Update_by_Map(array2d_New, array2d_Old,
         was_new = replaceIfEnds(was_new, ',00', '');
         now_new = replaceIfEnds(now_new, ',00', '');
 
+        was_new = convert2FloatCommaPointIfPossible(was_new);
+        now_new = convert2FloatCommaPointIfPossible(now_new);
+
         // в массив попадает то #VALUE!, то #ЗНАЧ!
         if (was_new == '#ЗНАЧ!') { was_new = '#VALUE!' };
         if (now_new == '#ЗНАЧ!') { now_new = '#VALUE!' };
 
-        if (String(was_new) != String(now_new)) {
+        if (was_new != now_new) {
 
           // гуглтаблица значения с двумя запятыми стремится преобразовать во время
           // now_new = symbolsMore1RepeatsReplace(now_new, ',', ' / ');
@@ -462,7 +468,7 @@ function Array1D_2_String(a1d, sepa) {
 function symbols_by_template(string_in, string_check) {
 
   // вернуть строку из символов string_in, которые ЕСТЬ в string_chek 
-  // float = '0123456789,.'
+  // float = DIGITS_COMMA_POINT
 
   var str_ret = '';
   var str_idx = '';
@@ -508,13 +514,12 @@ function string_2_float_if_Test() {
 }
 
 function string_2_float_if(string_in) {
-
   // определить, что строка число
   // если похоже на число, вернуть число, 
   // иначе вернуть оригинальную строку
 
   // сначала определяю наличие не нужных символов
-  var other = symbols_NOT_in_template(string_in, '0123456789 ,.');
+  var other = symbols_NOT_in_template(string_in, DIGITS_COMMA_POINT_SPACE);
 
   if (other.length > 0) {
 
@@ -522,7 +527,7 @@ function string_2_float_if(string_in) {
 
   }
 
-  return symbols_by_template(string_in, '0123456789,.');
+  return symbols_by_template(string_in, DIGITS_COMMA_POINT);
 }
 
 function Date_Time_Local() {
@@ -680,7 +685,7 @@ function digitsSpacesKiller() {
 
     var a2d = rng.getValues();
 
-    a2d = arrayXdDigitsSpaceKiller(a2d, '0123456789 ,');
+    a2d = arrayXdDigitsSpaceKiller(a2d, DIGITS_COMMA_POINT_SPACE);
 
     // вставить массив на лист
 
@@ -691,7 +696,7 @@ function digitsSpacesKiller() {
 
 function array2dDigitsSpaceKiller_Test() {
   var a1d = ['1 ,1', '', '1', 'z1'];
-  a1d = arrayXdDigitsSpaceKiller(a1d, '0123456789 ,');
+  a1d = arrayXdDigitsSpaceKiller(a1d, DIGITS_COMMA_POINT_SPACE);
   Logger.log(a1d);
 }
 
@@ -721,10 +726,10 @@ function arrayXdDigitsSpaceKiller(aXd, tmp) {
 
 
 function digitWithSpace_Test() {
-  Logger.log(digitWithSpace('', '0123456789 ,'));
-  Logger.log(digitWithSpace('1', '0123456789 ,'));
-  Logger.log(digitWithSpace('1 ,', '0123456789 ,'));
-  Logger.log(digitWithSpace('z1 ,', '0123456789 ,'));
+  Logger.log(digitWithSpace('', DIGITS_COMMA_POINT_SPACE));
+  Logger.log(digitWithSpace('1', DIGITS_COMMA_POINT_SPACE));
+  Logger.log(digitWithSpace('1 ,', DIGITS_COMMA_POINT_SPACE));
+  Logger.log(digitWithSpace('z1 ,', DIGITS_COMMA_POINT_SPACE));
 }
 
 function digitWithSpace(str, tmp) {
@@ -850,7 +855,7 @@ function convertIfPossible_Test() {
   var wante = 1;
   var conve = convertIfPossible(value, parseFloat)
   if (conve != wante) {
-    Logger.log('convertIfPossible:', conve, ' != ', wante);
+    Logger.log('convert2FloatCommaPointIfPossible: %s != %s', conve, wante);
   }
 
   value = '2,1z';
@@ -887,4 +892,75 @@ function convertIfPossible(value, method) {
   // преобразовать, испрользуя method, иначе вернуть value.
   var convert = method(value);
   return isNaN(convert) ? value : convert;
+}
+
+function convert2FloatCommaPointIfPossible_Test() {
+  var value = '1,1';
+  var wante = 1.1;
+  var conve = convert2FloatCommaPointIfPossible(value);
+  if (conve != wante) {
+    Logger.log('convert2FloatCommaPointIfPossible: %s != %s', conve, wante);
+  }
+
+  value = '2,1z';
+  wante = '2,1z';
+  conve = convert2FloatCommaPointIfPossible(value);
+  if (conve != wante) {
+    Logger.log('convert2FloatCommaPointIfPossible: %s != %s', conve, wante);
+  }
+
+  value = '3.1';
+  wante = 3.1;
+  conve = convert2FloatCommaPointIfPossible(value);
+  if (conve != wante) {
+    Logger.log('convert2FloatCommaPointIfPossible: %s != %s', conve, wante);
+  }
+
+  value = '4.1 Z';
+  wante = '4.1 Z';
+  conve = convert2FloatCommaPointIfPossible(value);
+  if (conve != wante) {
+    Logger.log('convert2FloatCommaPointIfPossible: %s != %s', conve, wante);
+  }
+
+  value = 'Z';
+  wante = 'Z';
+  conve = convert2FloatCommaPointIfPossible(value);
+  if (conve != wante) {
+    Logger.log('convert2FloatCommaPointIfPossible: %s != %s', conve, wante);
+  }
+}
+
+function convert2FloatCommaPointIfPossible(value_old) {
+  // конвертировать в число с плавающей точкой,
+  // с учётом запятой и точки
+  // сначала убедиться, что в строке только нужные символы
+  
+  if (digitsCommaPointSpace(value_old)) {
+    var value_new = value_old.replace(",", ".");
+    value_new = convertIfPossible(value_new, parseFloat);
+    return value_new;
+  }
+  return value_old;
+}
+
+
+function digitsCommaPointSpace(str) {
+
+  // строка похожа на число(с запятой, точкой, пробелом) ?
+
+  var smb = '';
+
+  for (var pos = 0; pos < str.length; pos++) {
+
+    smb = str[pos];
+
+    if (!symbolInString(smb, DIGITS_COMMA_POINT_SPACE)) {
+
+      return false;
+    }
+  }
+
+  return true;
+
 }
