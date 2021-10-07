@@ -964,3 +964,32 @@ function digitsCommaPointSpace(str) {
   return true;
 
 }
+
+function columnLetters2Number_Test() {
+
+  var numb = columnLetters2Number("AM");
+  Logger.log(numb);
+
+};
+
+function columnLetters2Number(letters) {
+  // по буквам столбца вернуть номер
+  var addre = letters + 1;
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var numbe = sheet.getRange(addre).getColumn();
+  return numbe;
+};
+
+
+function sheetColumnValueRowLastNumber(range) {
+  // принимает  диапазон,
+  // возвращает номер последней непустой строки
+  // идёт снизу вверх по массиву
+
+  var array1d = range.getValues();
+  for (var i = array1d.length - 1; i >= 0; i--) {
+    if (array1d[i][0] != null && array1d[i][0] != '') {
+      return i + 1;
+    };
+  };
+};
