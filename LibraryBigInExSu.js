@@ -993,3 +993,48 @@ function sheetColumnValueRowLastNumber(range) {
     };
   };
 };
+
+function sheetsList_Test() {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Оглавление');
+  const cell = sheet.getRange(3, 1);
+  const a1_except = ['Оглавление']
+  sheetsList(cell, a1_except);
+}
+
+function sheetsList(cell, a1_except) {
+  // вставить список листов начиная с ячейки cell
+  // исключая названия в a1_except
+
+  var shee = SpreadsheetApp.getActive().getSheets();
+  var row_ = 0;
+
+  for (var i = 0; i < shee.length; i++) {
+    var nCel = cell.offset(row_, 0);
+    var name = shee[i].getName();
+    if (a1_except.indexOf(name)) {
+      cellLink2Sheet(nCel, name);
+      row_++;
+    }
+  }
+}
+
+function cellLink2Sheet_Test() {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Оглавление')
+  const cell = sheet.getRange(1, 3);
+  const name = '1С';
+  const rnge = 'A1';
+  cellLink2Sheet(cell, name, rnge);
+}
+
+function cellLink2Sheet(cell, name, range) {
+  // вставить в ячейку ссылку на лист и диапазон
+
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(name);
+  var richText = SpreadsheetApp.newRichTextValue()
+    .setText(name)
+    //    .setLinkUrl('#gid=' + sheet.getSheetId() + '&range=' + range)
+    .setLinkUrl('#gid=' + sheet.getSheetId())
+    .build();
+  cell.setRichTextValue(richText);
+}
+
