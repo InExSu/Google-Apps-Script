@@ -1038,3 +1038,13 @@ function cellLink2Sheet(cell, name, range) {
   cell.setRichTextValue(richText);
 }
 
+function arrayRangeFill(values, sValue) {
+  // заполнить массив для диапазона значением sValue
+
+  for (var i = 0; i < values.length; i++) {
+    for (var j = 0; j < values[i].length; j++) {
+      values[i][j] = sValue;
+    }
+  }
+  return values;
+}
