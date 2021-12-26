@@ -1048,3 +1048,58 @@ function arrayRangeFill(values, sValue) {
   }
   return values;
 }
+
+// форматирование диапазона по образцу
+function onEdit(e) {
+
+  const sheet = e.source.getActiveSheet();
+
+  if (sheet.getName() == 'Ш - печать') {
+
+    if (e.range.getA1Notation() == 'A1') {
+
+      rowFormatDown(sheet);
+    }
+  }
+  return;
+}
+
+function rowFormatDown_Test(sheet) {
+  rowFormatDown(SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Ш - печать'));
+}
+
+function rowFormatDown(sheet) {
+  // с четвёртой строки, по ширине диапазона формат очистит.
+  // формат третьей строки распространить вниз на значения
+
+  const rangeValue = sheet.getRange(1, 1).getDataRegion(); //CurrentRegion
+  const rowMainNumber3 = 3;
+
+  if (rangeValue.getNumRows() < rowMainNumber3) { return };
+
+// колво строк в таблице 
+  var row_Down = sheet.getRange("A1:A").getValues().length;
+  var colCount = rangeValue.getNumColumns();
+
+// диапазон очистки
+  var rangeClear = sheet.getRange(
+    rowMainNumber3 + 1, 1,
+    - rowMainNumber3 + row_Down, colCount);
+
+  rangeClear.clearFormat();
+
+  // есть ли строки для окрашивания
+  if (rangeValue.getNumRows() < (rowMainNumber3 + 1)) { return };
+
+  const rangeRow = sheet.getRange(rowMainNumber3, 1, 1, colCount);
+  
+  const rowsFor = rangeValue.getNumRows() - rowMainNumber3;
+  const rangeFor = sheet.getRange(
+    rowMainNumber3 + 1, 1,
+    rowsFor, colCount); //типа resize, offset
+  
+  // основное действие
+  rangeRow.copyTo(rangeFor, SpreadsheetApp.CopyPasteType.PASTE_FORMAT, false);
+
+  return;
+}
