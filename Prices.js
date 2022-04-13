@@ -533,6 +533,21 @@ function artiCoolsCheck() {
   }
 }
 
+function artiCoolsPriceOne_Test() {
+
+  const a2ColumnArtics = [['102-011-0017'], ['102-011-0056']];
+  let a2ColumnPrices = [[11], [22]];
+  let a2Artics = a2Artics4One();
+
+  artiCoolsPriceOne(a2ColumnArtics, a2ColumnPrices, a2Artics);
+
+  if (a2ColumnPrices[1][0] == 11) {
+    console.log('artiCoolsPriceOne_Test OK!');
+  } else {
+    console.log('artiCoolsPriceOne_Test ОШИБКА! ожидалось 11, получил ' + a2ColumnPrices[1][0]);
+  }
+}
+
 function artiCoolsPriceOne(a2ColumnArtics, a2ColumnPrices, a2Artics) {
   // проходом по столбцу артикулов "сводная таблица"
   // взять цену из строки массива цен
@@ -548,7 +563,7 @@ function artiCoolsPriceOne(a2ColumnArtics, a2ColumnPrices, a2Artics) {
   for (let rowA = 0; rowA < a2ColumnArtics.length; rowA++) {
 
     artic = a2ColumnArtics[rowA][0];
-    a1Art = a2FindA1(a2Artics, value);
+    a1Art = a2FindA1(a2Artics, artic);
 
     if (typeof a1Art === 'object') {
 
@@ -658,3 +673,4 @@ function a2FindA1(a2, value) {
 }
 
 price2Artics_Test();
+artiCoolsPriceOne_Test();
