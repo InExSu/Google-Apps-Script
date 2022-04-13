@@ -39,7 +39,7 @@ function columnPriceDownSheetActive() {
   // вызываю из меню скриптов для активного листа
 
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  var cell_ = sheet.getRange(1,globalColumn28)
+  var cell_ = sheet.getRange(1, globalColumn28)
   var value = cell_.getValue();
 
   if (value !== 'снижение от НМЦ') {
