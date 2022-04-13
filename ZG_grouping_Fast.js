@@ -54,7 +54,7 @@ function ZG_grouping_Fast() {
   var array_group = range_group.getValues();
 
   // массив ассоциативный: код, строка номер
-  var map_group_code1s = Array2D_2_Map(array_group, 1);
+  var map_group_code1s = Array2D_Column_2_Map(array_group, 1);
   var map_group_code1s_size = map_group_code1s.size;
   Logger.log('map_group_code1s_rows = ' + map_group_code1s_size);
   var array_pivot_length = array_pivot.length;

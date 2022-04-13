@@ -36,13 +36,13 @@ function Range_Rows_Delete_by_Range(rng_Delete, column_Delete, rng_Search, colum
   var arr_Search = rng_Search.getValues();
 
   // массив поиска в ассоциативный массив
-  var map_Search = Array2D_2_Map(arr_Search, column_Search);
+  var map_Search = Array2D_Column_2_Map(arr_Search, column_Search);
 
   var val_Delete = '';
   var row_Delete = '';
   var row_in_map = false;
   var id = rng_Delete.getGridId();
-  var sheet_Dele = SheetById(id);
+  var sheet_Dele = sheetById(id);
   var array1d_value_Deleted = [];
   var row_1st = rng_Delete.getRow();
   var row_Curr = 0;

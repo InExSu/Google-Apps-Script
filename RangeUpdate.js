@@ -32,15 +32,13 @@ function Range_Update_by_Heads_RUN() {
   // подхватить с активного листа имя столбца - код (одинаков для обоих)
   // подхватить с активного листа имя ячейки на листе источнике и закинуть диапазона в массив Новый
   // из диапазонов заголовков создать массив пар совпадений по названию
-  // пусть пользователь проверит названия найденных столбцов совпадающих
   // вызвать функцию работы с диапазонами, которая:
   // из столбца кода источника создать словарь - код->номер строки в массиве источнике
   // проходом по столбцу кода назначения обновления,
   //   в словаре код есть ?
-  //     если есть взять номер строки массива Источника
+  //     если есть - взять номер строки массива Источника
   //       проходом по массиву Столбцы - обновить значения в массиве Старый
   // вставить массив Старый на лист активный
-
 
   var spread = SpreadsheetApp.getActiveSpreadsheet();
   var sheet_New = spread.getActiveSheet();
@@ -114,6 +112,15 @@ function Range_Update_by_Heads_RUN() {
 
             Range_Update_by_Heads(range_Old, column_Key_Old, range_New, column_Key_New, a2_Columns, 'Log')
 
+            // восстановить формулу в Артикул
+            // formula_n = '=ЕСЛИ(ЕНД(ВПР(A2;\'Артикулы СТ\'!$B:$C;2;0));\n   ЕСЛИ(ЕНД(ВПР(A2;\'Артикулы ТМ\'!$B:$C;2;0));\n     ЕСЛИ(ЕНД(ВПР(A2;\'Артикулы АРТИ\'!$B:$C;2;0));\n        ЕСЛИ(ЕНД(ВПР(A2;\'Артикулы ЭХМЗ\'!$B:$C;2;0));\n   "Не найдено";\n   ВПР(A2;\'Артикулы ЭХМЗ\'!$B:$C;2;0));\n   ВПР(A2;\'Артикулы АРТИ\'!$B:$C;2;0));\n   ВПР(A2;\'Артикулы ТМ\'!$B:$C;2;0));\n   ВПР(A2;\'Артикулы СТ\'!$B:$C;2;0))'
+            // formula_n = '=IF(ISNA(VLOOKUP(A2;\'Артикулы СТ\'!$B:$C;2;0));\n   IF(ISNA(VLOOKUP(A2;\'Артикулы ТМ\'!$B:$C;2;0));\n     IF(ISNA(VLOOKUP(A2;\'Артикулы АРТИ\'!$B:$C;2;0));\n        IF(ISNA(VLOOKUP(A2;\'Артикулы ЭХМЗ\'!$B:$C;2;0));\n   "Не найдено";\n   VLOOKUP(A2;\'Артикулы ЭХМЗ\'!$B:$C;2;0));\n   VLOOKUP(A2;\'Артикулы АРТИ\'!$B:$C;2;0));\n   VLOOKUP(A2;\'Артикулы ТМ\'!$B:$C;2;0));\n   VLOOKUP(A2;\'Артикулы СТ\'!$B:$C;2;0))'
+            // var origin = sheet_Old.getRange("B2");
+            // var target = sheet_Old.getRange("B3:B");
+            // origin.setFormula(formula_n);
+            // // формулу протянуть до последней
+            // origin.copyTo(target);
+
             choice = Browser.msgBox('Показать лист Log', Browser.Buttons.YES_NO);
             if (choice == 'yes') {
               var sheet_act = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Log');
@@ -126,27 +133,30 @@ function Range_Update_by_Heads_RUN() {
   }
 }
 
+function rangeFormulaFill(sheet, cellPut, rangeFill, formula) {
+  // в дипазон вставить формулу протягиванием
+  // let origin = sheet.getRange("B2");
+  // let target = sheet.getRange("B3:B");
+  let origin = sheet.getRange(cellPut);
+  let target = sheet.getRange(rangeFill);
+  origin.setFormula(formula);
+  // формулу протянуть до последней
+  origin.copyTo(target);
+}
 
 function Range_Update_by_Heads(rng_Old, column_Key_Old, rng_New, column_Key_New, a2d_columns, log_make) {
 
   // Обновить диапазон по совпадению в ключевых столбцах с учётом наименований столбцов
   // диапазоны в массивы
 
-  // 2021-09-10
-  // var a2d_Old = rng_Old.getValues();
-  // var a2d_New = rng_New.getValues();
-  var a2d_Old = range_2_ArrayValuesFormulas(rng_Old);
-  var a2d_New = range_2_ArrayValuesFormulas(rng_New);
+  let a2d_Old = range_2_ArrayValuesFormulas(rng_Old) //2022-02-17 rng_Old.getValues();
+  let a2d_New = range_2_ArrayValuesFormulas(rng_New);
 
-  // в листе "сводная таблица" в столбце Код нулей лидирующих нет,
-  // поэтому удаляю нули из нового. Нет не буду удалять, сделаю нули в ячейках.
-  //  array2dColumnSymbolsLeading(a2d_New, column_Key_New, '0');
-
-  var map_Sea = Array2D_2_Map(a2d_New, column_Key_New);
+  let map_Sea = Array2D_Column_2_Map(a2d_New, column_Key_New);
 
   // основное действие
 
-  var a2d_Ret = Array2D_Update_by_Map(a2d_New, a2d_Old,
+  let a2d_Ret = Array2D_Update_by_Map(a2d_New, a2d_Old,
     column_Key_Old, map_Sea, a2d_columns, 'Log');
 
   // массив положить на лист
@@ -252,8 +262,8 @@ function range_2_ArrayValuesFormulas(range) {
 
   // из диапазона вернуть массив значений и формул
 
-  var a2d_formul = range.getFormulas();
-  var a2d_values = range.getValues();
+  let a2d_formul = range.getFormulas();
+  let a2d_values = range.getValues();
   a2d_Values_add_Formulas(a2d_values, a2d_formul);
 
   return a2d_values;
@@ -308,3 +318,4 @@ function cells_Compare_Test() {
   Logger.log(typeof valu_01);
   Logger.log(typeof valu_02);
 }
+

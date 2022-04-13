@@ -1,25 +1,41 @@
 // Библиотека методов InExSu
 
+const DIGITS_COMMA_POINT = '0123456789,.';
+const DIGITS_COMMA_POINT_SPACE = '0123456789,. ';
+
+function Range_Rows_Test() {
+  let ssheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Log');
+
+  let rColu1 = ssheet.getRange('D1:D2');
+  let a2 = rColu1.getValues();
+  Logger.log(a2);
+
+  let rColu2 = ssheet.getRange('D1:E2');
+  a2 = rColu2.getValues();
+  Logger.log(a2);
+
+}
+
 function Array2D_Update_by_Map_Test() {
-  var a2d_New = [
+  let a2d_New = [
     ['CodeSour', 'ValueSour'],
     ['0', 'Новый '],
     ['1', 'Новый 2']
   ];
-  var a2d_Old = [
+  let a2d_Old = [
     ['CodeUpda', 'ValueUpda'],
     ['0', 'Старый'],
     ['1', 'Старый 2']
   ];
-  var column_code = 0;
-  var map_codes = Array2D_2_Map(a2d_New, 0);
-  var array2d_columns = [[1, 1]];
-  Logger.log('a2d_Update ' + a2d_Old);
+  let column_code = 0;
+  let map_codes = Array2D_Column_2_Map(a2d_New, 0);
+  let array2d_columns = [[1, 1]];
+  // Logger.log('a2d_Update ' + a2d_Old);
 
-  var a2d_New = Array2D_Update_by_Map(a2d_New, a2d_Old, column_code, map_codes, array2d_columns, 'Log');
+  a2d_New = Array2D_Update_by_Map(a2d_New, a2d_Old, column_code, map_codes, array2d_columns, 'Log');
 
   // Logger.log('a2d_New ' + a2d_New);
-  // Logger.log('a2d_Update ' + a2d_Old);
+  // Logger.log('a2d_Old ' + a2d_Old);
 }
 
 
@@ -33,24 +49,24 @@ function Array2D_Update_by_Map(array2d_New, array2d_Old,
   // 				Обновить значения элементов текущей строки массива назначения
 
   // массив 2мерный копировать не просто
-  var array2d_ret = JSON.parse(JSON.stringify(array2d_Old))
+  let array2d_ret = JSON.parse(JSON.stringify(array2d_Old));
 
-  var code = '';
-  var row_New = -1;
-  var row_Old = 0;
-  var col_New = -1;
-  var col_Old = -1;
+  let code = '';
+  let row_New = -1;
+  let row_Old = 0;
+  let col_New = -1;
+  let col_Old = -1;
 
   //var a2d_log = [['Код', 'Строка', 'Столбец', 'Было', 'Стало']];
-  var a2d_log = [['Лог обновления', '', Utilities.formatDate(new Date(), "GMT+3", "yyyy-MM-dd HH:mm:ss' мск'"), '', '']];
+  let a2d_log = [['Лог обновления', '', Utilities.formatDate(new Date(), "GMT+3", "yyyy-MM-dd HH:mm:ss' мск'"), '', '']];
   a2d_log.push(['', '', '', '', '']);
   a2d_log.push(['Код', 'Строка', 'Столбец', 'Было', 'Стало']);
 
-  var col = '';
-  var was_new = '';
-  var now_new = '';
-  var was_old = '';
-  var now_old = '';
+  let col = '';
+  let was_new = '';
+  let now_new = '';
+  let was_old = '';
+  let now_old = '';
 
   for (row_Old = 0; row_Old < array2d_ret.length; row_Old++) {
 
@@ -81,15 +97,14 @@ function Array2D_Update_by_Map(array2d_New, array2d_Old,
         was_new = replaceIfEnds(was_new, ',00', '');
         now_new = replaceIfEnds(now_new, ',00', '');
 
+        was_new = convert2FloatCommaPointIfPossible(was_new);
+        now_new = convert2FloatCommaPointIfPossible(now_new);
+
         // в массив попадает то #VALUE!, то #ЗНАЧ!
         if (was_new == '#ЗНАЧ!') { was_new = '#VALUE!' };
         if (now_new == '#ЗНАЧ!') { now_new = '#VALUE!' };
 
-        if (String(was_new) != String(now_new)) {
-
-          // гуглтаблица значения с двумя запятыми стремится преобразовать во время
-          // now_new = symbolsMore1RepeatsReplace(now_new, ',', ' / ');
-          // now_new = apostropheIfSymbolsMoreRepeats(now_new, ',', 1);
+        if (was_new != now_new) {
 
           // заголовок столбца в отчёт
           col = array2d_New[0][col_New];
@@ -106,7 +121,7 @@ function Array2D_Update_by_Map(array2d_New, array2d_Old,
 
   if (sheet_log_name) {
     // массив лога на лист
-    var sheet_logit = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheet_log_name);
+    let sheet_logit = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheet_log_name);
     sheet_logit.clear();
 
     cell = sheet_logit.getRange(1, 1);
@@ -119,15 +134,15 @@ function Array2D_Update_by_Map(array2d_New, array2d_Old,
 
 function SheetNameExists(sheetName) {
   /* существует ли лист*/
-  var spread = SpreadsheetApp.getActiveSpreadsheet();
-  var sheet = spread.getSheetByName(sheetName);
+  let spread = SpreadsheetApp.getActiveSpreadsheet();
+  let sheet = spread.getSheetByName(sheetName);
   if (sheet) {
     return True;
   }
 };
 
 function SheetDuplicate(sheetName) {
-  /*  var spreadsheet = SpreadsheetApp.getActive();
+  /*  let spreadsheet = SpreadsheetApp.getActive();
     spreadsheet.setActiveSheet(spreadsheet.getSheetByName('сводная таблица (копия)'), true);
     spreadsheet.deleteActiveSheet();
     spreadsheet.duplicateActiveSheet();*/
@@ -139,8 +154,8 @@ function SheetDuplicate(sheetName) {
 
 function SheetNameDelete(sheetName) {
   /* удалить лист по имени, если он есть*/
-  var spread = SpreadsheetApp.getActiveSpreadsheet();
-  var sheet = spread.getSheetByName(sheetName);
+  let spread = SpreadsheetApp.getActiveSpreadsheet();
+  let sheet = spread.getSheetByName(sheetName);
   if (sheet) {
     spread.deleteSheet(sheet);
   }
@@ -148,8 +163,8 @@ function SheetNameDelete(sheetName) {
 
 function getsheetById_test() {
   id = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet().getActiveCell().getGridId();
-  var sheet = sheetById(id);
-  Logger.log(sheet.getName());
+  let sheet = sheetById(id);
+  // Logger.log(sheet.getName());
 }
 
 function sheetById(id) {
@@ -163,27 +178,27 @@ function sheetById(id) {
 
 
 function Array2D_Column_Find_In_Row_Test() {
-  a2 = [
+  let a2 = [
     ['1', '2']
   ]
-  col = Array2D_Column_Find_In_Row(a2, 0, '3');
-  //  Logger.log(col);
+  let col = Array2D_Column_Find_In_Row(a2, 0, '3');
+  //  // Logger.log(col);
   col = Array2D_Column_Find_In_Row(a2, 0, '2');
-  //  Logger.log(col);
+  //  // Logger.log(col);
   a2 = [
     ['1', '2', '33'],
     ['4', '4', '3']
   ]
   col = Array2D_Column_Find_In_Row(a2, 1, '3');
-  Logger.log(col);
+  // Logger.log(col);
 }
 
 function Array2D_Column_Find_In_Row(array2d, row, string_find) {
   // в двумернном массиве, в строке найти значение, вернуть номер столбца или -1
-  var val = ''
+  let val = ''
   for (var column = 0; column < array2d[0].length; column++) {
     val = array2d[row][column];
-    // Logger.log(val);
+    // // Logger.log(val);
     if (array2d[row][column] == string_find) {
       return column;
     }
@@ -191,23 +206,17 @@ function Array2D_Column_Find_In_Row(array2d, row, string_find) {
   return -1;
 }
 
-function Range_Rows_Test() {
-  var ssheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('сводная таблица (копия)');
-  var rrange = ssheet.getRange('B2:D9');
-  Logger.log(Range_Rows(rrange, 1).getValues());
-}
-
 function Range_Rows(range_In, rows_count) {
 
   // вернуть строки диапазона
 
   // Parent двухходовочка
-  var sheet_id = range_In.getGridId();
-  var sheet_ob = sheetById(sheet_id);
+  let sheet_id = range_In.getGridId();
+  let sheet_ob = sheetById(sheet_id);
 
-  var row_number = range_In.getRow();
-  var column_number = range_In.getColumn(); //starting column position for this range
-  var columns_count = range_In.getNumColumns();
+  let row_number = range_In.getRow();
+  let column_number = range_In.getColumn(); //starting column position for this range
+  let columns_count = range_In.getNumColumns();
 
   return sheet_ob.getRange(row_number, column_number, rows_count, columns_count);
 }
@@ -215,14 +224,14 @@ function Range_Rows(range_In, rows_count) {
 function Map_from_2_Arrays1D_Test() {
   a1_sour = ['1', '2', '3'];
   a1_upda = ['4', '3', '2'];
-  var map = Map_from_2_Arrays1D(a1_sour, a1_upda);
+  let map = Map_from_2_Arrays1D(a1_sour, a1_upda);
 }
 
 function Map_from_2_Arrays1D(array1d_Update_Heads, array1d_Source_Heads) {
   // создать массив ассоциативный из двух массивов одномерных
-  var index = -1;
-  var map_return = new Map();
-  var val = '';
+  let index = -1;
+  let map_return = new Map();
+  let val = '';
 
   for (var idx = 0; idx < array1d_Update_Heads.length; idx++) {
 
@@ -241,45 +250,45 @@ function Map_from_2_Arrays1D(array1d_Update_Heads, array1d_Source_Heads) {
 
 function Array2D_2_Map_Test() {
   // тест создания массива ассоциативного из 2мерного
-  var a2 = [
+  let a2 = [
     [0, 1, 2], // строка 0  
     [3, 4, 5] // строка 1  
   ];
-  var map = Array2D_2_Map(a2, 0);
+  let map = Array2D_Column_2_Map(a2, 0);
   if (map.size == 2) {
-    Logger.log('Array2D_2_Map_Test = OK');
+    // Logger.log('Array2D_2_Map_Test = OK');
   } else {
-    Logger.log('Array2D_2_Map_Test = Ошибка');
+    // Logger.log('Array2D_2_Map_Test = Ошибка');
   }
   // тестирую повтор ключа
-  var a2 = [
+  a2 = [
     [0, 1, 2], // строка 0  
     [0, 4, 5] // строка 1  
   ];
-  var map = Array2D_2_Map(a2, 0);
+  map = Array2D_Column_2_Map(a2, 0);
   if (map.size == 1) {
-    Logger.log('Array2D_2_Map_Test повтор = OK');
+    // Logger.log('Array2D_2_Map_Test повтор = OK');
   } else {
-    Logger.log('Array2D_2_Map_Test повтор = Ошибка');
+    // Logger.log('Array2D_2_Map_Test повтор = Ошибка');
   }
   // тестирую регистр символов
-  var a2 = [
+  a2 = [
     ["Z", 1, 2], // строка 0  
     ["z", 4, 5] // строка 1  
   ];
-  var map = Array2D_2_Map(a2, 0);
+  map = Array2D_Column_2_Map(a2, 0);
   if (map.size == 2) {
-    Logger.log('Array2D_2_Map_Test регистр = OK');
+    // Logger.log('Array2D_2_Map_Test регистр = OK');
   } else {
-    Logger.log('Array2D_2_Map_Test регистр = Ошибка');
+    // Logger.log('Array2D_2_Map_Test регистр = Ошибка');
   }
 
 }
 
-function Array2D_2_Map(array2d, column_key) {
+function Array2D_Column_2_Map(array2d, column_key) {
   // из массива 2мерного вернуть словарь - массив ассоциативный: значение столбца и номер строки
-  var map_return = new Map();
-  var val = '';
+  let map_return = new Map();
+  let val = '';
   for (var row = 0; row < array2d.length; row++) {
     val = String(array2d[row][column_key]);
     if (val.length > 0) {
@@ -290,11 +299,68 @@ function Array2D_2_Map(array2d, column_key) {
   return map_return;
 }
 
+function Array2D_ColumnS_2_Map_Test() {
+  // тест создания массива ассоциативного из 2мерного
+  let a2 = [
+    [0, 1, 2], // строка 0  
+    [3, 4, 5]  // строка 1  
+  ];
+  let map = Array2D_ColumnS_2_Map(a2, 0, 2);
+  if (map.size == 2) {
+    // Logger.log('Array2D_2_Map_Test = OK');
+  } else {
+    // Logger.log('Array2D_2_Map_Test = Ошибка');
+  }
+  // тестирую повтор ключа
+  a2 = [
+    [0, 1, 2], // строка 0  
+    [0, 4, 5] // строка 1  
+  ];
+  map = Array2D_ColumnS_2_Map(a2, 0, 1);
+  if (map.size == 1) {
+    // Logger.log('Array2D_2_Map_Test повтор = OK');
+  } else {
+    // Logger.log('Array2D_2_Map_Test повтор = Ошибка');
+  }
+  // тестирую регистр символов
+  a2 = [
+    ["Z", 1, 2], // строка 0  
+    ["z", 4, 5] // строка 1  
+  ];
+  map = Array2D_ColumnS_2_Map(a2, 0, 2);
+  if (map.size == 2) {
+    // Logger.log('Array2D_2_Map_Test регистр = OK');
+  } else {
+    // Logger.log('Array2D_2_Map_Test регистр = Ошибка');
+  }
+
+}
+function Array2D_ColumnS_2_Map(array2d, column_key, column_Value) {
+  // из массива 2мерного вернуть словарь - массив ассоциативный: 
+  // значение столбца ключа и значение в столбце column_Value
+
+  let map_return = new Map();
+  let val = '';
+
+  for (var row = 0; row < array2d.length; row++) {
+
+    val = String(array2d[row][column_key]);
+
+    if (val.length > 0) {
+
+      // если ключ повторяется, то обновится значение
+      map_return.set(val, array2d[row][column_Value]);
+    }
+  }
+  return map_return;
+}
+
+
 function Sheet2Array2DTest() {
   const oSheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  Logger.log(oSheet.getName())
+  // Logger.log(oSheet.getName())
   const array2 = Sheet2Array2D(oSheet);
-  Logger.log(array2)
+  // Logger.log(array2)
 }
 
 function Sheet2Array2D(oSheet) {
@@ -303,19 +369,19 @@ function Sheet2Array2D(oSheet) {
 }
 
 function Array1D_2_HeadNumbers_LookUp_Test() {
-  var a2_Old = ['1', '2'];
-  var a2_New = ['2', '3'];
-  var a2_Ret = Array1D_2_HeadNumbers_LookUp(a2_Old, a2_New);
-  Logger.log(a2_Ret);
+  let a2_Old = ['1', '2'];
+  let a2_New = ['2', '3'];
+  let a2_Ret = Array1D_2_HeadNumbers_LookUp(a2_Old, a2_New);
+  // Logger.log(a2_Ret);
 }
 
 function Array1D_2_HeadNumbers_LookUp(array1d_Old, array1d_New) {
 
   // из двух 1мерных массивов создать массив 2мерный с соответствия номеров столбцов
 
-  var value;
-  var row_new;
-  var array2D = [];
+  let value;
+  let row_new;
+  let array2D = [];
 
   for (var row_old = 0; row_old < array1d_Old.length; row_old++) {
 
@@ -335,20 +401,20 @@ function Array1D_2_HeadNumbers_LookUp(array1d_Old, array1d_New) {
 }
 
 function Array2D_Column_2_String_Test() {
-  var array2d = [
+  let array2d = [
     [1, 1, 1],
     [2, 2, 2]
   ];
-  var separat = '\n';
-  var str_ret = Array2D_Column_2_String(array2d, 0, separat);
-  Logger.log(str_ret);
+  let separat = '\n';
+  let str_ret = Array2D_Column_2_String(array2d, 0, separat);
+  // Logger.log(str_ret);
 }
 
 function Array2D_Column_2_String(array2d, column, separator) {
   // вернуть строку из столбца массива 2мерного
 
-  var string_col = '';
-  var string_new = '';
+  let string_col = '';
+  let string_new = '';
 
   for (var row = 0; row < array2d.length; row++) {
     string_col = array2d[row][column] + separator;
@@ -360,10 +426,10 @@ function Array2D_Column_2_String(array2d, column, separator) {
 
 function array2d2Range_Test() {
 
-  var sheet = SpreadsheetApp.getActive().getSheetByName('Ошибки');
-  var cellu = sheet.getRange(1, 1);
+  let sheet = SpreadsheetApp.getActive().getSheetByName('Ошибки');
+  let cellu = sheet.getRange(1, 1);
 
-  var a2dim = [
+  let a2dim = [
     [1, 2],
     [3, 4]
   ];
@@ -375,10 +441,10 @@ function array2d2Range(cell, a2d) {
 
   // массив 2мерный вставить на лист
 
-  var sheet_id = cell.getGridId();
-  var sheet_ob = sheetById(sheet_id);
-  var row_numb = cell.getRow();
-  var col_numb = cell.getColumn();
+  let sheet_id = cell.getGridId();
+  let sheet_ob = sheetById(sheet_id);
+  let row_numb = cell.getRow();
+  let col_numb = cell.getColumn();
 
   sheet_ob.getRange(row_numb, col_numb, a2d.length, a2d[0].length).setValues(a2d);
 }
@@ -386,16 +452,16 @@ function array2d2Range(cell, a2d) {
 
 function Array2d_ColumnsEquals_RowsDelete_Test(a2d) {
 
-  var a2d_Old = [
+  let a2d_Old = [
     [1, 2],
     [2, 2],
     [3, 2],
     [3, 3]
   ];
 
-  var a2d_New = Array2d_ColumnsEquals_RowsDelete(a2d_Old);
+  let a2d_New = Array2d_ColumnsEquals_RowsDelete(a2d_Old);
 
-  Logger.log(a2d_New);
+  // Logger.log(a2d_New);
 }
 
 
@@ -404,10 +470,10 @@ function Array2d_ColumnsEquals_RowsDelete(a2d_In) {
   // массив удалить строки массива 2мерного с одинаковыми значениями
 
   // копировать массив 2мерный не просто
-  var a2d = JSON.parse(JSON.stringify(a2d_In))
+  let a2d = JSON.parse(JSON.stringify(a2d_In))
 
-  var val = '';
-  var equ = true;
+  let val = '';
+  let equ = true;
 
   for (var row = a2d.length - 1; row >= 0; row--) {
 
@@ -437,12 +503,12 @@ function Array2d_ColumnsEquals_RowsDelete(a2d_In) {
 
 function Arrays1D_ValuesEqual_Test() {
 
-  var a1a = ['Весна', 'Зима', 'Лето', 'Осень'];
-  var a1b = ['Добро', 'Зима', 'Собака'];
+  let a1a = ['Весна', 'Зима', 'Лето', 'Осень'];
+  let a1b = ['Добро', 'Зима', 'Собака'];
 
-  var a1z = Arrays1D_ValuesEqual(a1a, a1b);
+  let a1z = Arrays1D_ValuesEqual(a1a, a1b);
 
-  Logger.log(a1z)
+  // Logger.log(a1z)
 }
 
 function Arrays1D_ValuesEqual(a1d_1, a1d_2) {
@@ -462,10 +528,10 @@ function Array1D_2_String(a1d, sepa) {
 function symbols_by_template(string_in, string_check) {
 
   // вернуть строку из символов string_in, которые ЕСТЬ в string_chek 
-  // float = '0123456789,.'
+  // float = DIGITS_COMMA_POINT
 
-  var str_ret = '';
-  var str_idx = '';
+  let str_ret = '';
+  let str_idx = '';
 
   for (var i = 0; i < string_in.length; i++) {
 
@@ -486,8 +552,8 @@ function symbols_NOT_in_template(string_in, string_chek) {
 
   // вернуть строку из символов string_in, которых НЕТ в string_chek 
 
-  var str_ret = '';
-  var str_idx = '';
+  let str_ret = '';
+  let str_idx = '';
 
   for (var i = 0; i < string_in.length; i++) {
 
@@ -504,17 +570,16 @@ function symbols_NOT_in_template(string_in, string_chek) {
 
 
 function string_2_float_if_Test() {
-  Logger.log('90000013547');
+  // Logger.log('90000013547');
 }
 
 function string_2_float_if(string_in) {
-
   // определить, что строка число
   // если похоже на число, вернуть число, 
   // иначе вернуть оригинальную строку
 
   // сначала определяю наличие не нужных символов
-  var other = symbols_NOT_in_template(string_in, '0123456789 ,.');
+  let other = symbols_NOT_in_template(string_in, DIGITS_COMMA_POINT_SPACE);
 
   if (other.length > 0) {
 
@@ -522,19 +587,19 @@ function string_2_float_if(string_in) {
 
   }
 
-  return symbols_by_template(string_in, '0123456789,.');
+  return symbols_by_template(string_in, DIGITS_COMMA_POINT);
 }
 
 function Date_Time_Local() {
   // набросок
-  var formattedDate = Utilities.formatDate(new Date(), "GMT+3", "yyyy-MM-dd HH:mm:ss");
-  Logger.log(formattedDate);
+  let formattedDate = Utilities.formatDate(new Date(), "GMT+3", "yyyy-MM-dd HH:mm:ss");
+  // Logger.log(formattedDate);
 }
 
 
 function replaceIfEnds_Test() {
-  Logger.log(replaceIfEnds('1,00', ',00', ''));
-  Logger.log(replaceIfEnds('1,01', ',00', ''));
+  // Logger.log(replaceIfEnds('1,00', ',00', ''));
+  // Logger.log(replaceIfEnds('1,01', ',00', ''));
 }
 
 function replaceIfEnds(stri, what, for_) {
@@ -546,15 +611,15 @@ function replaceIfEnds(stri, what, for_) {
 }
 
 function symbolsMore1RepeatsReplace_Test() {
-  Logger.log(symbolsMore1RepeatsReplace("1,0", ',', ';'));
-  Logger.log(symbolsMore1RepeatsReplace("1,2,0", ',', ';'));
+  // Logger.log(symbolsMore1RepeatsReplace("1,0", ',', ';'));
+  // Logger.log(symbolsMore1RepeatsReplace("1,2,0", ',', ';'));
 }
 
 function symbolsMore1RepeatsReplace(stri, find, repl) {
 
   //  если find > 1, заменить на repl
 
-  var count = stri.split(find).length - 1;
+  let count = stri.split(find).length - 1;
 
   if (count > 1) {
     // replaceAll не поддержалась
@@ -564,15 +629,15 @@ function symbolsMore1RepeatsReplace(stri, find, repl) {
 }
 
 function apostropheIfSymbolsMore1Repeats_Test() {
-  Logger.log(apostropheIfSymbolsMoreRepeats("1,0", ',', 1));
-  Logger.log(apostropheIfSymbolsMoreRepeats("1,2,0", ',', 1));
+  // Logger.log(apostropheIfSymbolsMoreRepeats("1,0", ',', 1));
+  // Logger.log(apostropheIfSymbolsMoreRepeats("1,2,0", ',', 1));
 }
 
 function apostropheIfSymbolsMoreRepeats(stri, find, mini) {
 
   //  если find встречается > mini, довавить в начало апостроф
 
-  var count = stri.split(find).length - 1;
+  let count = stri.split(find).length - 1;
 
   if (count > mini) {
     return "'" + stri;
@@ -589,26 +654,26 @@ function Array2DFormRangeWithApostorphes(rng_New_In) {
   // имменно в ДИАПАЗОНЕ (ибо в массив попадут уже "улучшенные" значения).
   // вернуть массив с апострофами, а лист удалить
 
-  var spreadSh = SpreadsheetApp.getActiveSpreadsheet();
-  var sheetTmp = spreadSh.insertSheet();
-  var rangeTmp = sheetTmp.getRange(1, 1);
+  let spreadSh = SpreadsheetApp.getActiveSpreadsheet();
+  let sheetTmp = spreadSh.insertSheet();
+  let rangeTmp = sheetTmp.getRange(1, 1);
   rng_New_In.copyTo(rangeTmp);
 
   // UsedRange
-  var rng = sheetTmp.getDataRange();
+  let rng = sheetTmp.getDataRange();
 
 }
 
 function rangeApostropheAddIfMoreOne_Test() {
-  var sheet = SpreadsheetApp.getActive().getSheetByName('Ошибки');
+  let sheet = SpreadsheetApp.getActive().getSheetByName('Ошибки');
   // sheet.getRange(2, 2).setValue(',');
   // sheet.getRange(2, 3).setValue(',,');
-  // var rng = sheet.getRange('B2:C2')
+  // let rng = sheet.getRange('B2:C2')
   // rangeApostropheAddIfMoreOne(rng, ',');
-  var rng = sheet.getRange('E1')
+  let rng = sheet.getRange('E1')
   rangeApostropheAddIfMoreOne(rng, ',');
 
-  Logger.log(sheet.getRange('E1').getValue());
+  // Logger.log(sheet.getRange('E1').getValue());
 }
 
 function rangeApostropheAddIfMoreOne(rng, symb) {
@@ -616,23 +681,23 @@ function rangeApostropheAddIfMoreOne(rng, symb) {
   // проходом по ячейкам диапазона
   // значениям c двумя и более symb добавить спереди апостроф
 
-  var sh_id = rng.getGridId();
-  var sheet = sheetById(sh_id);
+  let sh_id = rng.getGridId();
+  let sheet = sheetById(sh_id);
 
-  var val = '';
-  var rowStart = rng.getRow();
-  var colStart = rng.getColumn();
-  var row_Stop = rowStart + rng.getNumRows() - 1;
-  var col_Stop = colStart + rng.getNumColumns() - 1;
-  var pos_Frst = -1;
-  var pos_Last = -1;
+  let val = '';
+  let rowStart = rng.getRow();
+  let colStart = rng.getColumn();
+  let row_Stop = rowStart + rng.getNumRows() - 1;
+  let col_Stop = colStart + rng.getNumColumns() - 1;
+  let pos_Frst = -1;
+  let pos_Last = -1;
 
   for (var row = rowStart; row <= row_Stop; row++) {
     for (var col = colStart; col <= col_Stop; col++) {
 
       val = sheet.getRange(row, col).getValue();
 
-      Logger.log(val);
+      // Logger.log(val);
 
       if (val.length > 0) {
 
@@ -653,16 +718,16 @@ function rangeApostropheAddIfMoreOne(rng, symb) {
 
 function textFinder_test() {
   // набросок
-  var sheet = SpreadsheetApp.getActive().getSheetByName('Ошибки');
-  var textFinder = sheet.createTextFinder(',')
+  let sheet = SpreadsheetApp.getActive().getSheetByName('Ошибки');
+  let textFinder = sheet.createTextFinder(',')
     .matchEntireCell(false)
     .useRegularExpression(true);
 
-  var a1_rng = textFinder.findAll();
+  let a1_rng = textFinder.findAll();
   for (var key in a1_rng) {  // OK in V8
-    var key = a1_rng[key];
-    var val = key.getValue();
-    Logger.log("val = %s", val);
+    let key = a1_rng[key];
+    let val = key.getValue();
+    // Logger.log("val = %s", val);
   }
 }
 
@@ -672,15 +737,15 @@ function digitsSpacesKiller() {
   // в выделенных ячейках,содержащих только цифры, пробелы, системный разделитель десятичных чисел,
   // удалить пробел
 
-  var rng = SpreadsheetApp.getActiveRange();
+  let rng = SpreadsheetApp.getActiveRange();
 
   if (rng === null) {
     // нет выделенного диапазона
   } else {
 
-    var a2d = rng.getValues();
+    let a2d = rng.getValues();
 
-    a2d = arrayXdDigitsSpaceKiller(a2d, '0123456789 ,');
+    a2d = arrayXdDigitsSpaceKiller(a2d, DIGITS_COMMA_POINT_SPACE);
 
     // вставить массив на лист
 
@@ -690,9 +755,9 @@ function digitsSpacesKiller() {
 
 
 function array2dDigitsSpaceKiller_Test() {
-  var a1d = ['1 ,1', '', '1', 'z1'];
-  a1d = arrayXdDigitsSpaceKiller(a1d, '0123456789 ,');
-  Logger.log(a1d);
+  let a1d = ['1 ,1', '', '1', 'z1'];
+  a1d = arrayXdDigitsSpaceKiller(a1d, DIGITS_COMMA_POINT_SPACE);
+  // Logger.log(a1d);
 }
 
 
@@ -702,7 +767,7 @@ function arrayXdDigitsSpaceKiller(aXd, tmp) {
   // цифры, пробелы, системный разделитель десятичных чисел - 
   // удалить пробел 
 
-  var ele = '';
+  let ele = '';
 
   for (var idx = 0; idx < aXd.length; idx++) {
 
@@ -721,17 +786,17 @@ function arrayXdDigitsSpaceKiller(aXd, tmp) {
 
 
 function digitWithSpace_Test() {
-  Logger.log(digitWithSpace('', '0123456789 ,'));
-  Logger.log(digitWithSpace('1', '0123456789 ,'));
-  Logger.log(digitWithSpace('1 ,', '0123456789 ,'));
-  Logger.log(digitWithSpace('z1 ,', '0123456789 ,'));
+  // Logger.log(digitWithSpace('', DIGITS_COMMA_POINT_SPACE));
+  // Logger.log(digitWithSpace('1', DIGITS_COMMA_POINT_SPACE));
+  // Logger.log(digitWithSpace('1 ,', DIGITS_COMMA_POINT_SPACE));
+  // Logger.log(digitWithSpace('z1 ,', DIGITS_COMMA_POINT_SPACE));
 }
 
 function digitWithSpace(str, tmp) {
 
   // строка похожа на число с пробелом ?
 
-  var smb = '';
+  let smb = '';
 
   for (var pos = 0; pos < str.length; pos++) {
 
@@ -762,7 +827,7 @@ function symbolInString(smb, str) {
 
 function array2dColumnSymbolsLeading_Test() {
 
-  var a2d = [
+  let a2d = [
     ['01', '02'],
     ['03', '04']
   ];
@@ -784,11 +849,11 @@ function stringSymbolsLeadingDelete(value, symbol) {
 
   // лидирующие символы удалить
 
-  var stringReturn = '';
+  let stringReturn = '';
 
-  var stringValue = String(value);
+  let stringValue = String(value);
 
-  var regexp = new RegExp('^' + String(symbol) + '+');
+  let regexp = new RegExp('^' + String(symbol) + '+');
 
   if (stringValue[0] === String(symbol)) {
 
@@ -812,30 +877,30 @@ function cellActiveInfo() {
   sheetName = sheet.getName()
   cell = sheet.getActiveCell();
 
-  Logger.log('Лист:' + sheetName + ', формат активной ячейки ' + cell.getNumberFormat());
-  Logger.log('getA1Notation(): ' + cell.getA1Notation());
-  Logger.log('getValue(): ' + cell.getValue());
+  // Logger.log('Лист:' + sheetName + ', формат активной ячейки ' + cell.getNumberFormat());
+  // Logger.log('getA1Notation(): ' + cell.getA1Notation());
+  // Logger.log('getValue(): ' + cell.getValue());
 }
 
 function getRangeColumnByNumb_test() {
 
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  var colnm = randomInteger(1, 9)
-  var rangeColumn = getRangeColumnByNumb(sheet, colnm);
+  let sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  let colnm = randomInteger(1, 9)
+  let rangeColumn = getRangeColumnByNumb(sheet, colnm);
 
   if (colnm !== rangeColumn.getColumn()) {
-    Logger.log('Номер столбца !== ' + colnm);
+    // Logger.log('Номер столбца !== ' + colnm);
   }
   else {
-    Logger.log('getRangeColumnByNumb_test = OK');
+    // Logger.log('getRangeColumnByNumb_test = OK');
   }
   return true;
 }
 
 function getRangeColumnByNumb(sheet, numb) {
   // вернуть диапазон столбца по номеру столбца
-  var range = sheet.getRange("A:A");
-  var rowsCount = range.getNumRows();
+  let range = sheet.getRange("A:A");
+  let rowsCount = range.getNumRows();
   return sheet.getRange(1, numb, rowsCount)
 }
 
@@ -846,45 +911,232 @@ function randomInteger(min, max) {
 }
 
 function convertIfPossible_Test() {
-  var value = '1,1';
-  var wante = 1;
-  var conve = convertIfPossible(value, parseFloat)
+  let value = '1,1';
+  let wante = 1;
+  let conve = convertIfPossible(value, parseFloat)
   if (conve != wante) {
-    Logger.log('convertIfPossible:', conve, ' != ', wante);
+    // Logger.log('convert2FloatCommaPointIfPossible: %s != %s', conve, wante);
   }
 
   value = '2,1z';
   wante = 2;
   conve = convertIfPossible(value, parseFloat)
   if (conve != wante) {
-    Logger.log('convertIfPossible: %s != %s', conve, wante);
+    // Logger.log('convertIfPossible: %s != %s', conve, wante);
   }
 
   value = '3.1';
   wante = 3.1;
   conve = convertIfPossible(value, parseFloat)
   if (conve != wante) {
-    Logger.log('convertIfPossible: %s != %s', conve, wante);
+    // Logger.log('convertIfPossible: %s != %s', conve, wante);
   }
 
   value = '4.1 Z';
   wante = 4.1;
   conve = convertIfPossible(value, parseFloat)
   if (conve != wante) {
-    Logger.log('convertIfPossible: %s != %s', conve, wante);
+    // Logger.log('convertIfPossible: %s != %s', conve, wante);
   }
 
   value = 'Z';
   wante = 'Z';
   conve = convertIfPossible(value, parseFloat)
   if (conve != wante) {
-    Logger.log('convertIfPossible: %s != %s', conve, wante);
+    // Logger.log('convertIfPossible: %s != %s', conve, wante);
   }
 }
 
 
 function convertIfPossible(value, method) {
   // преобразовать, испрользуя method, иначе вернуть value.
-  var convert = method(value);
+  let convert = method(value);
   return isNaN(convert) ? value : convert;
+}
+
+function convert2FloatCommaPointIfPossible_Test() {
+  let value = '2 100 830,00';
+  let wante = 2100830;
+  let conve = convert2FloatCommaPointIfPossible(value);
+  if (conve != wante) {
+    Logger.log('convert2FloatCommaPointIfPossible: %s != %s', conve, wante);
+  }
+
+  value = '2,1z';
+  wante = '2,1z';
+  conve = convert2FloatCommaPointIfPossible(value);
+  if (conve != wante) {
+    Logger.log('convert2FloatCommaPointIfPossible: %s != %s', conve, wante);
+  }
+
+  value = '3.1';
+  wante = 3.1;
+  conve = convert2FloatCommaPointIfPossible(value);
+  if (conve != wante) {
+    Logger.log('convert2FloatCommaPointIfPossible: %s != %s', conve, wante);
+  }
+
+  value = '4.1 Z';
+  wante = '4.1 Z';
+  conve = convert2FloatCommaPointIfPossible(value);
+  if (conve != wante) {
+    Logger.log('convert2FloatCommaPointIfPossible: %s != %s', conve, wante);
+  }
+
+  value = 'Z';
+  wante = 'Z';
+  conve = convert2FloatCommaPointIfPossible(value);
+  if (conve != wante) {
+    Logger.log('convert2FloatCommaPointIfPossible: %s != %s', conve, wante);
+  }
+}
+
+function convert2FloatCommaPointIfPossible(value_old) {
+  // конвертировать в число с плавающей точкой,
+  // с учётом запятой и точки
+  // сначала убедиться, что в строке только нужные символы
+
+  // для использования в map массива из диапазона
+  if (Array.isArray(value_old)) {
+    value_old = value_old.join();
+  }
+
+  if (digitsCommaPointSpace(value_old)) {
+    if (value_old % 1 != 0) {
+      let value_new = value_old.replace(/\s/g, '');
+      value_new = value_new.replace(",", ".");
+      value_new = convertIfPossible(value_new, parseFloat);
+      return value_new;
+    }
+  }
+  return value_old;
+}
+
+function isNumber_Test() {
+  console.log('число  860', isNumber(860));
+  console.log('строка 860', isNumber('860'));
+  console.log('строка 860.0', isNumber('860.0'));
+  console.log('строка 2 100 830,00', isNumber('2 100 830,00'));
+}
+
+function isNumber(str) {
+  // является ли строка числом
+
+  // if (typeof str != "string") return false // we only process strings!
+  // // could also coerce to string: str = ""+str
+  // return !isNaN(str) && !isNaN(parseFloat(str))
+
+  // if (str % 1 == 0)
+  //   return true;
+  // else
+  //   return false;
+
+  return (str % 1 == 0);
+}
+
+function digitsCommaPointSpace(str) {
+
+  // строка похожа на число(с запятой, точкой, пробелом) ?
+
+  let smb = '';
+
+  for (var pos = 0; pos < str.length; pos++) {
+
+    smb = str[pos];
+
+    if (!symbolInString(smb, DIGITS_COMMA_POINT_SPACE)) {
+
+      return false;
+    }
+  }
+
+  return true;
+
+}
+
+function a2Duplicates2a1_Test() {
+  let a2 = [
+    [1, 2],
+    [2, 1]
+  ];
+
+  let a1 = a2Duplicates2a1(a2);
+
+}
+
+function a2Duplicates2a1(a2) {
+  // поиск дубликатов в 2мерном массиве
+
+  let a1 = a2.flat(Infinity);
+  return a1Duplicates2a1(a1);
+}
+
+function a1Duplicates2a1_Test() {
+  let a1 = [1, 1, 2]
+  let du = a1Duplicates2a1(a1);
+}
+
+function a1Duplicates2a1(a1) {
+  // вернуть дубликаты 1мерного массива в 1мерном массиве
+
+  let dict = new Map();
+  let dupl = [];
+  let valu = '';
+
+  for (let i = 0; i < a1.length; i++) {
+    valu = a1[i];
+    if (dict.has(valu)) {
+      dupl.push(valu);
+    } else {
+      dict.set(valu, valu);
+    }
+  }
+  return dupl;
+}
+
+function a2FindRowCol_Test() {
+  let a2 = [
+    ['1', '33'],
+    ['4', '3']
+  ]
+  let a1 = a2FindRowCol(a2, '33');
+  // Logger.log('a1 = ' + a1);
+}
+
+function a2FindRowCol(a2, val) {
+  // найти в массиве val вернуть номера строк и столбца
+
+  for (let row = 0; row <= a2.length; row++) {
+    for (let col = 0; col <= a2[0].length; col++) {
+      // Logger.log(a2[row][col]);
+      if (a2[row][col] == val) {
+        return [row, col];
+      }
+    }
+  }
+}
+
+function rangeValues_2_Array() {
+  // как выгдядит массив 2мерный из дипазона? вот так
+  // [[Код 1С], []]
+  const oSheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  let array2 = oSheet.getRange("A1:A2").getValues();
+  Logger.log(array2);
+  array2 = oSheet.getRange("A1:B2").getValues();
+  Logger.log(array2);
+  Logger.log(array2[0]);
+  Logger.log(array2[0][0]);
+  console.log(array2[0][0]);
+}
+
+function cellDigit_Test() {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Ошибки');
+  const cell_ = sheet.getRange('A1')
+  let val = '2 2,3';
+
+  // val = val.replace(' ','');
+  // val = val.replace(',','.');
+  // val = parseFloat(val);
+  val = convert2FloatCommaPointIfPossible(val);
+  cell_.setValue(val);
 }

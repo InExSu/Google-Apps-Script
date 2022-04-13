@@ -6,7 +6,6 @@ function selectionDuplicates() {
 
   //console.log(a2);
 
-
   var duplicates = [];
 
   /* отсортировать массив, а затем проверить, совпадает ли «следующий элемент» с текущим элементом, и поместить его в массив: */
@@ -19,8 +18,8 @@ function selectionDuplicates() {
     }
   }
 
-// массив оставляю уникальные
-  duplicates = duplicates.filter(onlyUnique); 
+  // массив оставляю уникальные
+  duplicates = duplicates.filter(onlyUnique);
 
   Browser.msgBox(duplicates);
   //console.log(duplicates);
@@ -42,11 +41,13 @@ function onOpen() {
 
     .addItem('Дубликаты', 'selectionDuplicates')
 
+    // .addItem('Нули формат', 'selectionNullFormatted')
+
     .addSeparator()
 
-    .addSubMenu(ui.createMenu('Sub-menu')
+    // .addSubMenu(ui.createMenu('Sub-menu')
 
-      .addItem('Тест', 'sheetActive'))
+    //   .addItem('Тест', 'sheetActive'))
 
     .addToUi();
 
@@ -113,11 +114,12 @@ function IsNumeric(stringIN) {
 function columnBySheet() {
   // столбец в зависимости от имени листа
   const sheetName = SpreadsheetApp.getActiveSheet().getName();
-  //Browser.msgBox(sheetName);
-  if (sheetName == "Прайс без НДС") { return "$G:$G"; }
-  if (sheetName == "Прайс для партнеров без НДС") { return "$F:$F"; }
-  if (sheetName == "Прайс СНГ") { return "$I:$I"; }
-  if (sheetName == "Прайс для партнеров СНГ") { return "$H:$H"; }
+  if (sheetName == "Прайс без НДС") { return "$J:$J"; }
+  if (sheetName == "Прайс с НДС") { return "$L:$L"; }
+  if (sheetName == "Прайс партнеры без НДС") { return "$M:$M"; }
+  if (sheetName == "Прайс партнеры c НДС") { return "$N:$N"; }
+  if (sheetName == "Прайс СНГ") { return "$O:$O"; }
+  if (sheetName == "Прайс СНГ партнеры") { return "$P:$P"; }
 }
 
 function sheetActive() {

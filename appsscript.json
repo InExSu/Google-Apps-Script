@@ -38,6 +38,24 @@
     }, {
       "menuName": "DeleteCreate",
       "functionName": "DeleteCreate"
+    }, {
+      "menuName": "FormatSet2",
+      "functionName": "FormatSet2"
+    }, {
+      "menuName": "TextTutti",
+      "functionName": "TextTutti"
+    }, {
+      "menuName": "ДанныеПроверка",
+      "functionName": "myFunction"
+    }, {
+      "menuName": "FilterAll",
+      "functionName": "FilterAll"
+    }, {
+      "menuName": "CellReplace",
+      "functionName": "CellReplace"
+    }, {
+      "menuName": "CTRLShiftDown",
+      "functionName": "CTRLShiftDown"
     }]
   }
 }
