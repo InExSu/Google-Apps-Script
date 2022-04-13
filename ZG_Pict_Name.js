@@ -1,11 +1,11 @@
-function ZG_parser_Pictures_Names(){
-// со страницы https://protivogaz.ru/catalog/
-// взять ссылки, содержащие https://protivogaz.ru/catalog/
-// проходом рекурсивным по этим ссылкам создать массив Названий и ссылок
-// если на странице отрабатывают 2 XPath
-// массив на лист Картинки
+function ZG_parser_Pictures_Names() {
+  // со страницы https://protivogaz.ru/catalog/
+  // взять ссылки, содержащие https://protivogaz.ru/catalog/
+  // проходом рекурсивным по этим ссылкам создать массив Названий и ссылок
+  // если на странице отрабатывают 2 XPath
+  // массив на лист Картинки
 
-const sURL_start = "https://protivogaz.ru/catalog/";
+  const sURL_start = "https://protivogaz.ru/catalog/";
 
 
 }
@@ -15,7 +15,7 @@ const sURL_start = "https://protivogaz.ru/catalog/";
 // https://web.archive.org/web/20201121023356/http://googleappscripting.com/doget-dopost-tutorial-examples/
 
 // образец для разбора https://www.sites.google.com/site/scriptsexamples/learn-by-example/parsing-html
-function doGet() {
+function doGet01() {
 
   var html = UrlFetchApp.fetch('http://en.wikipedia.org/wiki/Document_Object_Model').getContentText();
 
@@ -29,7 +29,7 @@ function doGet() {
 
   return HtmlService.createHtmlOutput(output);
 
-}  
+}
 
 // We fetch the HTML through UrlFetch
 
@@ -55,26 +55,26 @@ function doGet() {
 
   var linksInMenu = getElementsByTagName(menu, 'a');
 
-  for(i in linksInMenu) output+= XmlService.getRawFormat().format(linksInMenu[i])+'<br>';
+  for (i in linksInMenu) output += XmlService.getRawFormat().format(linksInMenu[i]) + '<br>';
 
   return HtmlService.createHtmlOutput(output);
 
 }
 
 
-function getElementById(element, idToFind) {  
+function getElementById(element, idToFind) {
 
-  var descendants = element.getDescendants();  
+  var descendants = element.getDescendants();
 
-  for(i in descendants) {
+  for (i in descendants) {
 
     var elt = descendants[i].asElement();
 
-    if( elt !=null) {
+    if (elt != null) {
 
       var id = elt.getAttribute('id');
 
-      if( id !=null && id.getValue()== idToFind) return elt;    
+      if (id != null && id.getValue() == idToFind) return elt;
 
     }
 
@@ -83,35 +83,35 @@ function getElementById(element, idToFind) {
 }
 
 
-function getElementsByClassName(element, classToFind) {  
+function getElementsByClassName(element, classToFind) {
 
   var data = [];
 
   var descendants = element.getDescendants();
 
-  descendants.push(element);  
+  descendants.push(element);
 
-  for(i in descendants) {
+  for (i in descendants) {
 
     var elt = descendants[i].asElement();
 
-    if(elt != null) {
+    if (elt != null) {
 
       var classes = elt.getAttribute('class');
 
-      if(classes != null) {
+      if (classes != null) {
 
         classes = classes.getValue();
 
-        if(classes == classToFind) data.push(elt);
+        if (classes == classToFind) data.push(elt);
 
         else {
 
           classes = classes.split(' ');
 
-          for(j in classes) {
+          for (j in classes) {
 
-            if(classes[j] == classToFind) {
+            if (classes[j] == classToFind) {
 
               data.push(elt);
 
@@ -133,17 +133,17 @@ function getElementsByClassName(element, classToFind) {
 
 }
 
-function getElementsByTagName(element, tagName) {  
+function getElementsByTagName(element, tagName) {
 
   var data = [];
 
-  var descendants = element.getDescendants();  
+  var descendants = element.getDescendants();
 
-  for(i in descendants) {
+  for (i in descendants) {
 
-    var elt = descendants[i].asElement();     
+    var elt = descendants[i].asElement();
 
-    if( elt !=null && elt.getName()== tagName) data.push(elt);      
+    if (elt != null && elt.getName() == tagName) data.push(elt);
 
   }
 

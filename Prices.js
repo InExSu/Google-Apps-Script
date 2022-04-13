@@ -42,6 +42,9 @@ function rangePriceColumnUpade() {
     const a2_Svodnya_BD = sheet_Svodnaya.getRange('B:D').getValues();
     priceGrowths(a2_Price_bez_NDS_Prices_LQ, a2_Svodnya_BD, a2_Column_Prices_J);
 
+    // проставить цены по массиву артикулов соответствия 2022-04-13
+    artiCoolsPriceOne(a2_Svodnaya_Artics_B, a2_Column_Prices_J, a2Artics4One())
+
     range_Svodnaya_J.setValues(a2_Column_Prices_J);
 
     rangePriceColumnUpade_Log(sheet_Logg, a2_Svodnaya_Artics_B, a2_Column_Prices_Old, a2_Column_Prices_J);
@@ -672,5 +675,5 @@ function a2FindA1(a2, value) {
   }
 }
 
-price2Artics_Test();
-artiCoolsPriceOne_Test();
+// price2Artics_Test();
+// artiCoolsPriceOne_Test();
