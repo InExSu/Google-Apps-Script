@@ -533,6 +533,128 @@ function artiCoolsCheck() {
   }
 }
 
-function artiCoolsPriceOne() {
-  
+function artiCoolsPriceOne(a2ColumnArtics, a2ColumnPrices, a2Artics) {
+  // проходом по столбцу артикулов "сводная таблица"
+  // взять цену из строки массива цен
+  // искать артикул в массиве массивов одинаковых артикулов
+  // проходом по вложенному массиву по столбцу артикулов
+  // проставить цену в столбец цен
+
+  let artic = '';
+  let a1Art = [];
+  let price = 0;
+  let mapArtics = Array2D_2_Map(a2ColumnArtics)
+
+  for (let rowA = 0; rowA < a2ColumnArtics.length; rowA++) {
+
+    artic = a2ColumnArtics[rowA][0];
+    a1Art = a2FindA1(a2Artics, value);
+
+    if (typeof a1Art === 'object') {
+
+      price = a2ColumnPrices[rowA][0];
+
+      price2Artics(mapArtics, a2ColumnPrices, a1Art, price);
+
+    }
+  }
 }
+
+function price2Artics_Test() {
+  const a2Artics = [['1-1'], ['2-2']];
+  const mapArtics = Array2D_2_Map(a2Artics);
+  let a2ColumnPrices = [[11], [22]];;
+  const a1Art = ['3-3', '2-2'];
+  const price = 1;
+  price2Artics(mapArtics, a2ColumnPrices, a1Art, price)
+  if (a2ColumnPrices[1][0] !== price) {
+    console.log('price2Artics_Test, ошибка ожидалось 1, получил' + a2ColumnPrices[1][0]);
+  } else {
+    console.log('price2Artics_Test Ok!');
+  }
+}
+function price2Artics(mapArtics, a2ColumnPrices, a1Art, price) {
+  // расставить артикулам цены
+
+  artic = '';
+  row = -1;
+
+  for (let index = 0; index < a1Art.length; index++) {
+
+    artic = a1Art[index];
+
+    if (mapArtics.has(artic)) {
+
+      row = mapArtics.get(artic);
+
+      a2ColumnPrices[row][0] = price;
+    }
+  }
+}
+
+
+function a2Artics4One() {
+  // вернуть массив артикулов одинаковых цен
+  return [
+    ['102-011-0017', '102-011-0056'],
+    ['102-011-0012', '102-011-0079'],
+    ['101-011-0003', '101-011-0004'],
+    ['101-011-0005', '101-011-0006'],
+    ['101-011-0007', '101-011-0008'],
+    ['102-044-0001', '102-044-0002'],
+    ['102-044-0003', '102-044-0004'],
+    ['102-044-0005', '102-044-0006'],
+    ['102-044-0007', '102-044-0008'],
+    ['102-044-0009', '102-044-0010'],
+    ['102-044-0011', '102-044-0012'],
+    ['102-044-0013', '102-044-0014'],
+    ['102-044-0015', '102-044-0016'],
+    ['102-044-0017', '102-044-0018'],
+    ['102-024-0003', '102-024-0004', '102-024-0005'],
+    ['102-025-0001', '102-025-0002', '102-025-0003'],
+    ['102-025-0004', '102-025-0005', '102-025-0006'],
+    ['102-025-0007', '102-025-0008', '102-025-0009'],
+    ['302-122-0001', '302-122-0002', '302-122-0003', '302-122-0004', '302-122-0005'],
+    ['302-122-0006', '302-122-0007', '302-122-0008', '302-122-0009'],
+    ['302-122-0010', '302-122-0011', '302-122-0012', '302-122-0013'],
+    ['302-123-0003', '302-123-0004', '302-123-0005', '302-123-0006', '302-123-0007'],
+    ['302-123-0008', '302-123-0009']
+  ];
+}
+
+function a2FindA1_Test() {
+  let a2 = a2Artics4One();
+
+  let a1 = a2FindA1(a2, '102-011-0017');
+  console.log(typeof a1);
+
+  a1 = a2FindA1(a2, '302-123-0007');
+  console.log(typeof a1);
+
+  a1 = a2FindA1(a2, '');
+  console.log(typeof a1);
+}
+
+function a2FindA1(a2, value) {
+  //  найти в массиве массивов и вернуть массив 1мерный
+
+  if (value !== '') {
+
+    let a1 = [];
+
+    for (let row = 0; row < a2.length; row++) {
+
+      a1 = a2[row];
+
+      for (let idx = 0; idx < a1.length; idx++) {
+
+        if (value == a1[idx]) {
+
+          return a2[row];
+        }
+      }
+    }
+  }
+}
+
+price2Artics_Test();
